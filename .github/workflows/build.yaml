@@ -61,3 +61,35 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  build-installer:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Talos installer with extension
+        run: |
+          docker run --rm -v $(pwd):/out ghcr.io/siderolabs/imager:v1.11.5 installer \
+            --arch arm64 \
+            --system-extension-image ghcr.io/siderolabs/usb-modem-drivers:v1.11.5 \
+            --system-extension-image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            --extra-kernel-arg 'dwc2.dr_mode=peripheral'
+
+      - name: Load and push installer image
+        run: |
+          docker load -i installer-arm64.tar
+          docker tag ghcr.io/siderolabs/installer-base:v1.11.5 ${{ env.REGISTRY }}/${{ github.repository_owner }}/talos-installer-usb-gadget:v1.11.5
+          docker tag ghcr.io/siderolabs/installer-base:v1.11.5 ${{ env.REGISTRY }}/${{ github.repository_owner }}/talos-installer-usb-gadget:latest
+          docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/talos-installer-usb-gadget:v1.11.5
+          docker push ${{ env.REGISTRY }}/${{ github.repository_owner }}/talos-installer-usb-gadget:latest

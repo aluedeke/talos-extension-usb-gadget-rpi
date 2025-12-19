@@ -82,9 +82,6 @@ jobs:
         run: |
           docker run --rm -v $(pwd):/out ghcr.io/siderolabs/imager:v1.11.5 installer \
             --arch arm64 \
-            --overlay-name rpi_generic \
-            --overlay-image ghcr.io/siderolabs/sbc-raspberrypi:v0.1.2 \
-            --overlay-option "configTxt=dtoverlay=dwc2,dr_mode=peripheral" \
             --system-extension-image ghcr.io/siderolabs/usb-modem-drivers:v1.11.5 \
             --system-extension-image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
             --extra-kernel-arg 'dwc2.dr_mode=peripheral'

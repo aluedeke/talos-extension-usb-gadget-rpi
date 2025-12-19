@@ -1,0 +1,15 @@
+name: usb-gadget
+container:
+  entrypoint:
+    - /bin/sh
+    - /usb-gadget-init.sh
+  mounts:
+    - source: /sys
+      destination: /sys
+      type: bind
+      options:
+        - rbind
+        - rw
+depends:
+  - configuration
+restart: never

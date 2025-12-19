@@ -1,0 +1,23 @@
+version: v1alpha1
+metadata:
+  name: usb-gadget-rpi
+  version: 0.1.0
+  author: QA Wolf
+  description: |
+    USB Gadget Ethernet for Raspberry Pi 4.
+    Enables network + power over single USB-C cable.
+
+    Creates a CDC ECM network interface (usb0) when the Pi is
+    connected to a host computer via USB-C.
+
+    Requirements:
+    - Raspberry Pi 4 (Pi 5 USB-C is power-only)
+    - dwc2 module loaded with dr_mode=peripheral
+
+    Host setup:
+    - Linux: interface appears as usb0
+    - macOS: appears as "RNDIS/Ethernet Gadget"
+
+compatibility:
+  talos:
+    version: ">= v1.6.0"
